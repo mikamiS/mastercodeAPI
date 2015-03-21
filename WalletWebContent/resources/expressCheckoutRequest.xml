@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ExpressCheckoutRequest>
+    <MerchantCheckoutId></MerchantCheckoutId>
+    <PrecheckoutTransactionId></PrecheckoutTransactionId>
+    <CurrencyCode></CurrencyCode>
+    <OrderAmount></OrderAmount>
+    <CardId></CardId>
+    <ShippingAddressId></ShippingAddressId>
+    <WalletId></WalletId>
+    <AdvancedCheckoutOverride></AdvancedCheckoutOverride>
+    <OriginUrl></OriginUrl>
+</ExpressCheckoutRequest>
