@@ -2,6 +2,7 @@
 require_once('Controller/MasterPassController.php');
 require_once('Controller/MasterPassHelper.php');
 
+header('Content-Type: text/javascript; charset=utf-8');
 //////////////////////////////////////////////////////////
 // from index.html
 //////////////////////////////////////////////////////////
@@ -39,14 +40,14 @@ $errorMessage = null;
 // from O2.html
 //////////////////////////////////////////////////////////
 try {
-	$sad = $controller->postShoppingCart($_POST_DATA['subTotal']); // <-- this load default sample data
+	$sad = $controller->postShoppingCart($_GET['subTotal']); // <-- this load default sample data
 	
 } catch (Exception $e){
 	$errorMessage = MasterPassHelper::formatError($e->getMessage());
 }	
 
-
-
-
-
+$result = array();
+$result["requestToken"] = $sad->requestToken;
+$result["merchantCheckoutId"] = $sad->checkoutIdentifier;
+echo json_encode($result);
 ?>
