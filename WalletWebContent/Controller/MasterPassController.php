@@ -129,36 +129,29 @@ class MasterPassController {
 		}
 	}	
 	
-	public function processParameters($_POST_DATA) {
-		if($_POST_DATA) {
-			$acceptedCardsString = "";
-			
-			if(isset($_POST_DATA['acceptedCardsCheckbox'])){
-				foreach($_POST_DATA['acceptedCardsCheckbox'] as $value){
-					$acceptedCardsString .= $value . ",";
-				}
-			}
-			
-			if(isset($_POST_DATA['privateLabelText'])){
-				$acceptedCardsString = $acceptedCardsString.$_POST_DATA['privateLabelText'];
-			} else {
-				$acceptedCardsString = substr($acceptedCardsString,0,strlen($acceptedCardsString)-1);
-			}
-			
-			$this->appData->acceptableCards = $acceptedCardsString;
-			$this->appData->xmlVersion = isset($_POST_DATA['xmlVersionDropdown']) ?  $_POST_DATA['xmlVersionDropdown'] : "";
-			$this->appData->shippingSuppression = isset($_POST_DATA['shippingSuppressionDropdown']) ? $_POST_DATA['shippingSuppressionDropdown'] : "";
-			$this->appData->rewardsProgram = isset($_POST_DATA['rewardsDropdown']) ?  $_POST_DATA['rewardsDropdown'] : "";
-			$this->appData->shippingProfile = isset($_POST_DATA['$shippingProfileDropdown']) ?  $_POST_DATA['shippingProfileDropdown'] : "";
-				
-			if(isset($_POST_DATA['authenticationCheckBox']) && $_POST_DATA['authenticationCheckBox'] == "on") {
-				$this->appData->authLevelBasic = "true";
-			}
-			else {
-				$this->appData->authLevelBasic = "false";
-			}
+	public function processParameters($acceptedCards, $xmlVersion) {
+
+		$acceptedCardsString = "";
 		
+		foreach($acceptedCards as $value){
+			$acceptedCardsString .= $value . ",";
 		}
+		
+		$acceptedCardsString = substr($acceptedCardsString,0,strlen($acceptedCardsString)-1);
+		
+		$this->appData->acceptableCards = $acceptedCardsString;
+		$this->appData->xmlVersion = $xmlVersion;
+		$this->appData->shippingSuppression = "";
+		$this->appData->rewardsProgram = "";
+		$this->appData->shippingProfile = "";
+			
+		// if(isset($_POST_DATA['authenticationCheckBox']) && $_POST_DATA['authenticationCheckBox'] == "on") {
+		// 	$this->appData->authLevelBasic = "true";
+		// }
+		// else {
+			$this->appData->authLevelBasic = "false";
+		// }
+		
 		return $this->appData;
 	}
 	
@@ -237,10 +230,12 @@ class MasterPassController {
 	 * @param String: $requestToken
 	 *
 	 * @return XML object
-	 */public function parseShoppingCartXML($requestToken) {
+	 */
+	public function parseShoppingCartXML($requestToken, $subTotal) {
 		$shoppingCartData = simplexml_load_string($this->loadXmlFile(MasterPassController::SHOPPING_CART_XML));
 		$shoppingCartData->OAuthToken = $requestToken;
 		$shoppingCartData->OriginUrl = $this->appData->originUrl;
+		$shoppingCartData->ShoppingCart->Subtotal = $subTotal;
 		$shoppingCartData = $this->updateImageURL($shoppingCartData);
 		
 		foreach($shoppingCartData->ShoppingCart->ShoppingCartItem as $item){
@@ -364,8 +359,8 @@ class MasterPassController {
 		return $this->appData;
 	}
 	
-	public function postShoppingCart() {
-		$shoppingCartRequest = $this->parseShoppingCartXML($this->appData->requestToken);
+	public function postShoppingCart($subTotal) {
+		$shoppingCartRequest = $this->parseShoppingCartXML($this->appData->requestToken, $subTotal);
 		$this->appData->shoppingCartRequest = $shoppingCartRequest->asXML();
 		$this->appData->shoppingCartResponse = $this->service->postShoppingCartData($this->appData->shoppingCartUrl, $this->appData->shoppingCartRequest);
 		return $this->appData;
