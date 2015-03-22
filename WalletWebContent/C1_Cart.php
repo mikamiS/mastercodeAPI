@@ -7,6 +7,8 @@ session_start();
 $sad = unserialize($_SESSION['sad']);
 $controller = new MasterPassController($sad);
 
+error_log("shippingSuppressionDropdown:".$_POST['shippingSuppressionDropdown']);
+error_log("shippingProfileDropdown:".$_POST['shippingProfileDropdown']);
 $sad = $controller->processParameters($_POST);
 
 $errorMessage = null;
@@ -15,6 +17,7 @@ if(isset($_GET["error"])) {
 }
 
 try {
+
 	$sad = $controller->getRequestToken();
 	$sad = $controller->postShoppingCart();
 } catch (Exception $e) {
@@ -25,6 +28,8 @@ $checkoutData = $controller->parseShoppingCartXMLPrint();
 
 $_SESSION['sad'] = serialize($sad);
 
+error_log("shippingSuppression:".$sad->shippingSuppression);
+error_log("allowedLoyaltyPrograms:".$sad->allowedLoyaltyPrograms);
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
